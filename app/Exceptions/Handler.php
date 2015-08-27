@@ -38,7 +38,16 @@ class Handler extends ExceptionHandler
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $e)
-    {
-        return parent::render($request, $e);
+    {	
+    	
+    	$status = trans('message.rest_status_fail');
+    	$exception_code = $e->getCode();
+    	$developerMessage['exception_type'] = get_class($e);
+    	$developerMessage['error_info'] = $e->getFile().",". $e->getLine();
+    	$developerMessage['error_code'] =  $exception_code;
+    	return response()->json(array("status" => $status, "status_code" => 503, "developer_message" => $developerMessage ),500);
+    	
+        
+    	#return parent::render($request, $e);
     }
 }

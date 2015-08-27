@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Models\UserModel;
+use Log;
 
 class MemberController extends Controller
 {
 	
 	public function __construct()
 	{
-		
+		Log::info("loggged");
 	}
 	
     /**
@@ -23,6 +24,7 @@ class MemberController extends Controller
      */
     public function get_user_detail(Request $request,$member_id)
     {
+    	
     	/*$validator = Validator::make($request->all(), [
     			'member_id' => 'required|exists:members|digits',
     			]);
@@ -34,6 +36,7 @@ class MemberController extends Controller
     		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $errors ), 203);
     		 
     	}*/
+    	//$member_id  = $request->input('member_id');
     	$user = UserModel::where('member_id',$member_id)->first();
     	
     	if(!empty($user)){
@@ -75,6 +78,13 @@ class MemberController extends Controller
     			]);
     	 
     	if ($validator->fails()) {
+    		$valid = ['member_id'];
+    		$msgs = $validator->errors();
+    		for($i=0; $i< count($valid);$i++){
+    			if($msgs->has($valid[$i])){
+    				$response['validation_error'][$valid[$i]] = $msgs->first($valid[$i]);
+    			}
+    		}
     		$statusCode = 203;
     		$status = trans("message.rest_status_fail");
     		$response['message'] = trans('message.invalid_request') ;
@@ -102,7 +112,7 @@ class MemberController extends Controller
     	
     }
     
-    public function get_event_list($member_id)
+    public function get_event($member_id)
     {
     	$event_data = MemberEventModel::where('member_id',$member_id)->get();
     	if(!empty($event_data))

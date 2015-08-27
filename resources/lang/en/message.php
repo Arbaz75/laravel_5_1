@@ -15,4 +15,5 @@ return [
 		'register_success' => "User Register Successfully",
 		'change_password_success' => "Password has been Changed Successfully",
 		'update_data_success' => "Data Updated Successfully",
+		'validation_error' => "Validation Error",
 ];
