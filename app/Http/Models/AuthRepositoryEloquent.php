@@ -5,6 +5,7 @@ namespace App\Http\Models;
 use App\Http\Models\MemberTokenModel;
 use App\Http\Models\UserModel;
 use DB;
+use Mail;
 
 class AuthRepositoryEloquent
 {
@@ -19,7 +20,7 @@ class AuthRepositoryEloquent
         $token_data = DB::table('member_token')->where("member_id",$userId)->value('member_id');
         
         //*** Update User Token ***//
-        MemberTokenModel::updateOrCreate(array('member_id' => $userId),array(
+        MemberTokenModel::create(array(
             'token'=> $token,
             'member_id' => $userId
          ));
@@ -39,6 +40,11 @@ class AuthRepositoryEloquent
     
     public function send_password_email($user_detail,$token)
     {
-    	//Send email to user with Token
+    	Mail::send('emails.password', [$user_detail,$token], function($message,$user_detail){
+		$message->from('admin@admin.com', 'Admin');
+		
+		$message->to($user_detail->email);
+		
+		});
     }
 }

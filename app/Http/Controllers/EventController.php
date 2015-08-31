@@ -76,7 +76,7 @@ class EventController extends Controller
     			'date_generated' => date('Y-m-d H:i:s'),
     			
     		);
-    	$event_data = MemberEventModel::create([$event_detail]);
+    	$event_data = MemberEventModel::create($event_detail);
     	if(!empty($event_data)){
     		$status = trans("message.rest_status_success" );
     		$statusCode = 200;

@@ -16,18 +16,26 @@ Route::pattern('event_id', '[0-9]+');
 Route::group(['prefix' => 'api/v1','middleware' => 'check'],function()
   {
       Route::post('auth/login', 'LoginController@post_login');
-      Route::get('auth/logout', 'LoginController@get_logout');
-      Route::post('auth/register', 'LoginController@post_register');
-      Route::post('auth/forgot_password', 'LoginController@get_forget_password');
-      Route::post('auth/change_password', 'LoginController@post_change_password');
-      //**User requests Routs**//
-      Route::get('user/{member_id}','MemberController@get_user_detail');
-      Route::post('user/{member_id}/update', 'MemberController@post_update');
-      Route::get('user/{member_id}/event', 'MemberController@get_event');
-      //**Event Route**//
-      Route::get('event/{event_id}', 'EventController@get_event_list');
-      Route::post('event/add', 'EventController@post_event');
-      Route::post('event/update', 'EventController@post_event_update');
+      Route::post('auth/register', 'LoginController@post_register'); 
+      Route::post('auth/forgot_password', 'LoginController@get_forget_password'); 
+      
+      //Logged In URLs 
+      
+      Route::group(['middleware'=>'token'],function()
+      {
+      	Route::get('auth/logout', 'LoginController@get_logout');
+      	Route::post('auth/change_password', 'LoginController@post_change_password');
+      	//**User requests Routs**//
+      	Route::get('user/{member_id}','MemberController@get_user_detail');
+      	Route::post('user/{member_id}/update', 'MemberController@post_update');
+      	Route::get('user/{member_id}/event', 'MemberController@get_event');
+      	//**Event Route**//
+      	Route::get('event/{event_id}', 'EventController@get_event_list');
+      	Route::post('event/add', 'EventController@post_event');
+      	Route::post('event/update', 'EventController@post_event_update');
+      
+      });
+      
       
 
   });

@@ -16,4 +16,7 @@ return [
 		'change_password_success' => "Password has been Changed Successfully",
 		'update_data_success' => "Data Updated Successfully",
 		'validation_error' => "Validation Error",
+		'empty_token' => "Token Required",
+		'unauthorized_user' => "Unauthorized Request",
+		'new_password_same_as_old' => "New password must be different",
 ];

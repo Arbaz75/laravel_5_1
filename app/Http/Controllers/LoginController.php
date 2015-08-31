@@ -83,9 +83,9 @@ class LoginController extends Controller
     	$token = $request->input("token");
     	//*** check for authorize user ***//
     	$check_id = DB::table('member_token')->where('member_id',$member_id)->where('token',$token)->value("token");
-    
+    	
     	if($check_id == Null){
-    		$statusCode = 400;
+    		$statusCode = 203;
     		$status = trans("message.rest_status_fail");
     		$response['message'] = trans('message.invalid_token') ;
     		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 203);
@@ -220,7 +220,7 @@ class LoginController extends Controller
     	$validator = Validator::make($request->all(), [
     			'email_id' => 'required|exists:members|email',
     			'password' => 'required|min:5',
-    			'new_password' => 'required|min:5',
+    			'new_password' => 'required|min:5|different:password',
     			]);
     	if ($validator->fails()) {
     		$valid = ['email_id','password','new_password'];
