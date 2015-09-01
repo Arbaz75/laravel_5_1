@@ -22,7 +22,8 @@ class AuthRepositoryEloquent
         //*** Update User Token ***//
         MemberTokenModel::create(array(
             'token'=> $token,
-            'member_id' => $userId
+            'member_id' => $userId,
+            
          ));
         return $token;
     }

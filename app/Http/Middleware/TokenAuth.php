@@ -24,6 +24,7 @@ class TokenAuth
     		if(!empty($user)){
 				
     			$request->merge(array('user_data' => $user));
+    			MemberTokenModel::where('token',$token)->update(['requests'=> $user->requests + 1]);
     			return $next($request);
     		}
     		else{
