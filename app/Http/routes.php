@@ -27,8 +27,8 @@ Route::group(['prefix' => 'api/v1','middleware' => 'check'],function()
       	Route::post('auth/change_password', 'LoginController@post_change_password');
       	//**User requests Routs**//
       	Route::get('user/{member_id}','MemberController@get_user_detail');
-      	Route::post('user/{member_id}/update', 'MemberController@post_update');
-      	Route::get('user/{member_id}/event', 'MemberController@get_event');
+      	Route::post('user/{member_id}/update', 'MemberController@post_profile_update');
+      	Route::get('user/{member_id}/events/{start?}/{length?}', 'MemberController@get_events');
       	//**Event Route**//
       	Route::get('event/{event_id}', 'EventController@get_event_list');
       	Route::post('event/add', 'EventController@post_event');

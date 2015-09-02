@@ -28,15 +28,12 @@ class EventController extends Controller
     			'is_completed' => $event_data->is_completed,
     			
     		);
-    		$status = trans("message.rest_status_success" );
-    		$statusCode = 200;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 200);
+    		return $this->response_success($response);
     	}
     	else{
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		
     		$response['message'] = trans('message.invalid_request');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		return $this->response_fail($response);
     	}
     	
     }
@@ -59,16 +56,9 @@ class EventController extends Controller
     	
     	if ($validator->fails()) {
     		$valid = ['member_id','name','goal_time','distance','interval'];
-    		$msgs = $validator->errors();
-    		for($i=0; $i< count($valid);$i++){
-    			if($msgs->has($valid[$i])){
-    				$response['validation_error'][$valid[$i]] = $msgs->first($valid[$i]);
-    			}
-    		}
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		$response = validation_check($validator,$valid);
     		$response['message'] = trans('message.invalid_request');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		return $this->response_fail($response);
     		 
     	}
     	
@@ -90,17 +80,14 @@ class EventController extends Controller
     		);
     	$event_data = MemberEventModel::create($event_detail);
     	if(!empty($event_data)){
-    		$status = trans("message.rest_status_success" );
-    		$statusCode = 200;
     		$response['event_detail'] = $event_data;
     		$response['message'] = trans('message.data_insert_success');;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 200);
+    		return $this->response_success($response);
     	}
     	else{
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		
     		$response['message'] = trans('message.invalid_request');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		return $this->response_fail($response);
     	}
     	
     }
@@ -119,16 +106,10 @@ class EventController extends Controller
     	
     	if ($validator->fails()) {
     		$valid = ['event_id','name'];
-    		$msgs = $validator->errors();
-    		for($i=0; $i< count($valid);$i++){
-    			if($msgs->has($valid[$i])){
-    				$response['validation_error'][$valid[$i]] = $msgs->first($valid[$i]);
-    			}
-    		}
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		$response = $this->validation_check($validator,$valid);
+    		
     		$errors['message'] = trans('message.invalid_request');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $errors ), 203);
+    		return $this->response_fail($response);
     		 
     	}
     	
@@ -139,6 +120,8 @@ class EventController extends Controller
     	$interval = $request->input('');
     	$value = $request->input('');*/
     	
+    	
+    	
     	$update_detail = array(
     			'name' => $name,
     			'date_generated' => date('Y-m-d H:i:s'),
@@ -147,16 +130,13 @@ class EventController extends Controller
     	
     	$event_data = MemberEventModel::where('event_id', $event_id)->update([$event_detail]);
     	if(!empty($event_data)){
-    		$status = trans("message.rest_status_success" );
-    		$statusCode = 200;
     		$response['event_detail'] = $event_data;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 200);
+    		return $this->response_success($response);
     	}
     	else{
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		
     		$response['message'] = trans('message.invalid_request');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		return $this->response_fail($response);
     	}
     	
     }

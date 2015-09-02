@@ -31,7 +31,6 @@ class LoginController extends Controller
     		$status = trans('message.rest_status_fail') ;
     		$statusCode = 203;
     		$response['message'] = trans('message.validation_error') ;
-    		
     		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 203);
     		
     	}
@@ -56,10 +55,8 @@ class LoginController extends Controller
                 
             }
             else{
-                $status = trans("message.rest_status_fail" );
-                $statusCode = 203;
-                $errors['message'] = trans('message.invalid_credentials') ;
-                return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $errors, ), 203);
+            	$response['message'] = trans('message.invalid_credentials');
+            	return $this->response_fail($response);
             }
        
         }
@@ -85,10 +82,8 @@ class LoginController extends Controller
     	$check_id = DB::table('member_token')->where('member_id',$member_id)->where('token',$token)->value("token");
     	
     	if($check_id == Null){
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
     		$response['message'] = trans('message.invalid_token') ;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 203);
+    		return $this->response_fail($response);
     	}
     	else{
     		//***Remove User Token ***//
@@ -117,16 +112,9 @@ class LoginController extends Controller
 
         if ($validator->fails()) {
         	$valid = ['email_id'];
-        	$msgs = $validator->errors();
-        	for($i=0; $i< count($valid);$i++){
-        		if($msgs->has($valid[$i])){
-        			$response['validation_error'][$valid[$i]] = $msgs->first($valid[$i]);
-        		}
-        	}
-            $statusCode = 400;
-            $status = trans("message.rest_status_fail");
+        	$response = $this->validation_check($validator,$valid);
             $response['message'] = trans('message.invalid_request') ;
-            return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 203);
+            return $this->response_fail($response);
         }
         $email = $request->input('email_id');
         $user_data = UserModel::where('email_id', $email)->first();
@@ -147,10 +135,8 @@ class LoginController extends Controller
         	
         }
         else{
-        	$statusCode = 203;
-        	$status = trans("message.rest_status_fail");
         	$response['message'] = trans('message.invalid_request') ;
-        	return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 203);
+        	return $this->response_fail($response);
         	
         }
         
@@ -171,16 +157,9 @@ class LoginController extends Controller
     			]);
     	if ($validator->fails()) {
     		$valid = ['email_id','name','password','city'];
-    		$msgs = $validator->errors();
-    		for($i=0; $i< count($valid);$i++){
-    			if($msgs->has($valid[$i])){
-    				$response['validation_error'][$valid[$i]] = $msgs->first($valid[$i]);
-    			}
-    		}
-    		$statusCode = 203;
-        	$status = trans("message.rest_status_fail");
-        	$response['message'] = trans('message.invalid_request') ;
-        	return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		$response = $this->validation_check($validator,$valid);
+    		$response['message'] = trans('message.invalid_request') ;
+        	return $this->response_fail($response);
         	
     	}
     	
@@ -199,12 +178,17 @@ class LoginController extends Controller
     	$user_data['last_activity'] = date('Y-m-d H:i:s');
     	/*Insert User Data Into DataBase */
     	$user = UserModel::create($user_data);
-    	if(!empty($user)){
-    	$response = $user;
-    	$status = trans("message.rest_status_success" );
-    	$statusCode = 200;
-    	$response['message'] = trans("message.register_success" );
-    	return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 200);
+    	if(!empty($user))
+    	{
+	    	$response = $user;
+	    	$status = trans("message.rest_status_success" );
+	    	$statusCode = 200;
+	    	$response['message'] = trans("message.register_success" );
+	    	return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 200);
+    	}
+    	else{
+    		$response['message'] = trans('message.invalid_request') ;
+    		return $this->response_fail($response);
     	}
     	
     }
@@ -224,16 +208,9 @@ class LoginController extends Controller
     			]);
     	if ($validator->fails()) {
     		$valid = ['email_id','password','new_password'];
-    		$msgs = $validator->errors();
-    		for($i=0; $i< count($valid);$i++){
-    			if($msgs->has($valid[$i])){
-    				$response['validation_error'][$valid[$i]] = $msgs->first($valid[$i]);
-    			}
-    		}
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		$response = $this->validation_check($validator,$valid);
     		$response['message'] = trans('message.invalid_request');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		return $this->response_fail($response);
     		 
     	}
     	
@@ -253,10 +230,9 @@ class LoginController extends Controller
     		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 200);
     	}
     	else{
-    		$statusCode = 203;
-    		$status = trans("message.rest_status_fail");
+    		
     		$response['message'] = trans('message.invalid_credentials');
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 203);
+    		return $this->response_fail($response);
     	}
     	
     }
