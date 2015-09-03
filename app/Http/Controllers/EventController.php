@@ -7,9 +7,18 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Models\MemberEventModel;
+use App\Http\Models\IntervalRecordModel;
+use App\Http\Models\AuthRepositoryEloquent;
 use Validator;
+use Log;
+
 class EventController extends Controller
 {
+	
+	public function __construct(AuthRepositoryEloquent $auth){
+		$this->auth = $auth;
+	
+	}
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +29,7 @@ class EventController extends Controller
     	$event_data = MemberEventModel::where('event_id',$event_id)->first();
     	if(!empty($event_data))
     	{
-    		$response = array(
+    		$response['event_details'] = array(
     			'name' => $event_data->name,
     			'date_created' => $event_data->date_created,
     			'number_of_intervals' => $event_data->intervals,
@@ -28,6 +37,14 @@ class EventController extends Controller
     			'is_completed' => $event_data->is_completed,
     			
     		);
+    		$laps_data = IntervalRecordModel::where('event_id',$event_id)->orderBy('lap_id','desc')->get();
+    		Log::info($laps_data);
+    		foreach($laps_data as $lap){
+    			
+    			$response['laps_details'][$lap->lap_id] = $lap->lap_time;
+    		}
+    				   			
+    		
     		return $this->response_success($response);
     	}
     	else{
@@ -102,35 +119,49 @@ class EventController extends Controller
     	$validator = Validator::make($request->all(), [
     			'event_id'=> 'required|exists:event',
     			'name' => 'required|min:5',
+    			'laps' => 'array',
     			]);
     	
     	if ($validator->fails()) {
-    		$valid = ['event_id','name'];
+    		$valid = ['event_id','name','laps'];
     		$response = $this->validation_check($validator,$valid);
-    		
     		$errors['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
     		 
     	}
     	
-    	//Parameter Need to be Added
-    	/*$name = $request->input('');
-    	$member_id = $request->input('');
-    	$time = $request->input('');
-    	$interval = $request->input('');
-    	$value = $request->input('');*/
-    	
-    	
-    	
+    	$laps_array = $request->input('laps');
+    	$name = $request->input('name');
+    	$event_id = $request->input('event_id');
     	$update_detail = array(
     			'name' => $name,
-    			'date_generated' => date('Y-m-d H:i:s'),
-    			
+    			'date_created' => date('Y-m-d H:i:s'),
     		);
-    	
-    	$event_data = MemberEventModel::where('event_id', $event_id)->update([$event_detail]);
-    	if(!empty($event_data)){
-    		$response['event_detail'] = $event_data;
+    	//Update Event table
+    	$event_data = MemberEventModel::where ( 'event_id', $event_id )->update( $update_detail );
+		$laps_count = count($laps_array)+1;
+		
+		//*Update Interval Records*//
+		foreach($laps_array as  $lap){
+				$valid_time = $this->auth->time_validate($lap['lap_time']);
+				if($valid_time == 1){
+					IntervalRecordModel::updateOrCreate(array('event_id' => $event_id,'lap_id'=>$lap['lap_id']),[
+					'lap_id'=>$lap['lap_id'],
+					'lap_time' =>$lap['lap_time'],
+					]);
+				}
+				else{
+					$response['message'] = trans('message.invalide_time');
+					return $this->response_fail($response);
+				}
+				
+			
+			
+		}
+		/**/
+		
+    	if($event_data==1){
+    		$response['message'] = trans('message.event_updated');
     		return $this->response_success($response);
     	}
     	else{
@@ -140,4 +171,6 @@ class EventController extends Controller
     	}
     	
     }
+    
+    
 }

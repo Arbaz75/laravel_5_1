@@ -44,7 +44,8 @@ class LoginController extends Controller
             if(Hash::check($password, $user->password) && $user->is_active == 1){
 				$token = $this->auth->generate_token_for_user($user->member_id);
                 $response = array(
-                    'username' => $user->name,
+                    'first_name' => $user->first_name,
+                	'last_name' => $user->last_name,
                     'email'    => $user->email_id,
                     'token'    => $token,
                 );

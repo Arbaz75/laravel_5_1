@@ -20,4 +20,6 @@ return [
 		'unauthorized_user' => "Unauthorized Request",
 		'new_password_same_as_old' => "New password must be different",
 		'data_insert_success' => "Data Inserted Successfully",
+		'event_updated'=> "Event Updated Successfully",
+		'invalide_time' => "Invalid Time, format must be HH::MM",
 ];
