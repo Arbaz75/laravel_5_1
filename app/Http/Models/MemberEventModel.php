@@ -8,9 +8,11 @@ class MemberEventModel extends Model
 {
 	protected $table = 'event';
 	
-	protected $primary = ['event_id'];
+	protected $primaryKey  = 'event_id';
 	
-	protected $fillable = ['name', 'member_id', 'goal_time','last_activity'];
+	protected $hidden = ['last_updated','date_created','event_id'];
+	
+	protected $fillable = ['name', 'member_id', 'goal_time','last_activity','date_created'];
 	
 	public $timestamps = false;
 }

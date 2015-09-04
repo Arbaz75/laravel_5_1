@@ -8,7 +8,7 @@ return [
 		'rest_status_success' => "Success",
 		'invalid_credentials' => "Invalid Credentials",
 		'invalid_token' => 'Invalid Member Id or Token',
-		'login_success' => "Logout Successfully" ,
+		'logout_success' => "Logout Successfully" ,
 		'invalid_api_key'=>'Invalid API Key',
 		'login_success' =>  "Login Successful",
 		'reset_password_success'=> "Password has been sent Successfully",

@@ -12,7 +12,6 @@ class MemberTokenModel extends Model
 
    	protected $fillable = ['token','member_id'];
    	
-   	protected $guarded = ['member_token_id'];
    	
    	public $timestamps = false;
 

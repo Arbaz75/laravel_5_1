@@ -30,8 +30,8 @@ class AuthRepositoryEloquent
     
     public function update_user_verification_token($member_id)
     {
-    	$PasswordVerificationToken = str_random(40);
-    	UserModel::updateOrCreate(array('member_id' => $member_id),array(
+    	$PasswordVerificationToken = str_random(30);
+    	MemberTokenModel::updateOrCreate(array('member_id' => $member_id),array(
     	'token'=> $PasswordVerificationToken,
     	'member_id' => $userId)
     	);
@@ -43,8 +43,8 @@ class AuthRepositoryEloquent
     {
     	Mail::send('emails.password', [$user_detail,$token], function($message,$user_detail){
 		$message->from('admin@admin.com', 'Admin');
-		
-		$message->to($user_detail->email);
+		$message->to($user_detail->email_id);
+		Log::info('send_password_email:Mail sent Successfully');
 		
 		});
     }

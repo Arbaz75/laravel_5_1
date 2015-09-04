@@ -17,7 +17,7 @@ Route::group(['prefix' => 'api/v1','middleware' => 'check'],function()
   {
       Route::post('auth/login', 'LoginController@post_login');
       Route::post('auth/register', 'LoginController@post_register'); 
-      Route::post('auth/forgot_password', 'LoginController@get_forget_password'); 
+      Route::post('auth/forgot_password', 'LoginController@post_forgot_password'); 
       
       //Logged In URLs 
       
@@ -30,7 +30,7 @@ Route::group(['prefix' => 'api/v1','middleware' => 'check'],function()
       	Route::post('user/{member_id}/update', 'MemberController@post_profile_update');
       	Route::get('user/{member_id}/events/{start?}/{length?}', 'MemberController@get_events');
       	//**Event Route**//
-      	Route::get('event/{event_id}', 'EventController@get_event_list');
+      	Route::get('event/{event_id}', 'EventController@get_event');
       	Route::post('event/add', 'EventController@post_add_event');
       	Route::post('event/update', 'EventController@post_event_update');
       

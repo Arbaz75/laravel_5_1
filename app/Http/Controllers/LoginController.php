@@ -8,18 +8,30 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Models\AuthRepositoryEloquent;
 use Validator;
-use DB;
 use Hash;
 use Log;
 use App\Http\Models\UserModel;
+use App\Http\Models\MemberTokenModel;
 
 class LoginController extends Controller
 {
+	
+	/**
+	 * Contructor Method
+	 * 
+	 * @param AuthRepositoryEloquent $auth
+	 */
     public function __construct(AuthRepositoryEloquent $auth){
         $this->auth = $auth;
         
     }
     
+    /**
+     * post_login
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function post_login(Request $request)
     {
     	$validator = Validator::make($request->all(), [
@@ -28,29 +40,26 @@ class LoginController extends Controller
     			]);
     	
     	if ($validator->fails()) {
-    		$status = trans('message.rest_status_fail') ;
-    		$statusCode = 203;
+    		Log::info("post_login:Validation Fail");
     		$response['message'] = trans('message.validation_error') ;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 203);
-    		
+    		return $this->response_fail($response);
     	}
     	
         $email = $request->input('email_id');
         $password =$request->input('password');
 		//*** Fetch User Details ***//
         $user = UserModel::where('email_id', $email)->first();
-        if($user != Null){
+        if(!empty($user)){
 
             if(Hash::check($password, $user->password) && $user->is_active == 1){
 				$user->token = $this->auth->generate_token_for_user($user->member_id);
 				$response = $user;
-                $status = trans("message.rest_status_success" );
-                $statusCode = 200;
-                $message = trans("message.login_success" );
-                return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 200);
+                $response['message'] = trans("message.login_success" );
+                return $this->response_success($response);
                 
             }
             else{
+            	Log::info("post_login:Invalid Username or Password");
             	$response['message'] = trans('message.invalid_credentials');
             	return $this->response_fail($response);
             }
@@ -58,7 +67,14 @@ class LoginController extends Controller
         }
     }
     
-    //*** Function to logout user ***//
+  
+    /**
+     * get_logout
+     * Function to logout user
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function get_logout(Request $request)
     {
     	$validator = Validator::make($request->all(), [
@@ -66,29 +82,26 @@ class LoginController extends Controller
     			'token' => 'required|min:50',
     			]);
     	if ($validator->fails()) {
-    		$statusCode = 400;
-    		$status = trans("message.rest_status_fail");
     		$response['message'] = trans('message.invalid_request') ;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 203);
+    		return $this->response_fail($response);
     	}
     	
     	$member_id = $request->input("member_id");
     	$token = $request->input("token");
     	//*** check for authorize user ***//
-    	$check_id = DB::table('member_token')->where('member_id',$member_id)->where('token',$token)->value("token");
+    	$check_id = MemberTokenModel::where('member_id',$member_id)->where('token',$token)->value("token");
     	
-    	if($check_id == Null){
+    	if(empty($check_id)){
     		$response['message'] = trans('message.invalid_token') ;
     		return $this->response_fail($response);
     	}
     	else{
     		//***Remove User Token ***//
     		$update_data['token'] = '';
-    		$update = DB::table("member_token")->where("member_id",$member_id)->where("token",$token)->update($update_data);
-    		$status = trans("message.rest_status_success" );
-    		$response['message']= trans("message.login_success");
-    		$statusCode = 200;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 200);
+    		$update = MemberTokenModel::where("member_id",$member_id)->where("token",$token)->update($update_data);
+    		Log::info("get_logout:User Token Removed Successfully");
+    		$response['message']= trans("message.logout_success");
+    		return $this->response_success($response);
     
     	}
     }
@@ -100,7 +113,7 @@ class LoginController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function post_forget_password(Request $request)
+    public function post_forgot_password(Request $request)
     {
         $validator = Validator::make($request->all(), [
                 'email_id' => 'required|exists:members|email',
@@ -108,7 +121,7 @@ class LoginController extends Controller
 
         if ($validator->fails()) {
         	$valid = ['email_id'];
-        	$response = $this->validation_check($validator,$valid);
+        	$response = $this->validation_error_mapper($validator,$valid);
             $response['message'] = trans('message.invalid_request') ;
             return $this->response_fail($response);
         }
@@ -125,15 +138,14 @@ class LoginController extends Controller
         if(!empty($mail)){
         	
         	$status = trans("message.rest_status_success" );
-        	$statusCode = 200;
+        	$apiStatusCode = 200;
         	$response['message'] = trans("message.reset_password_success" );
-        	return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 200);
+        	return $this->response_success($response);
         	
         }
         else{
         	$response['message'] = trans('message.invalid_request') ;
         	return $this->response_fail($response);
-        	
         }
         
     }
@@ -153,8 +165,9 @@ class LoginController extends Controller
     			'city' => 'required|alpha',
     			]);
     	if ($validator->fails()) {
+    		Log::info("post_register :Validation Fails");
     		$valid = ['email_id','first_name','last_name','password','city'];
-    		$response = $this->validation_check($validator,$valid);
+    		$response = $this->validation_error_mapper($validator,$valid);
     		$response['message'] = trans('message.invalid_request') ;
         	return $this->response_fail($response);
         	
@@ -176,14 +189,14 @@ class LoginController extends Controller
     	$user_data['date_created'] = date('Y-m-d H:i:s'); 
     	$user_data['last_activity'] = date('Y-m-d H:i:s');
     	/*Insert User Data Into DataBase */
+    	
     	$user = UserModel::create($user_data);
+    	Log::info("post_register :Data Inserted successfully");
     	if(!empty($user))
     	{
-	    	$response = $user;
-	    	$status = trans("message.rest_status_success" );
-	    	$statusCode = 200;
+	    	$response['user_detail'] = $user;
 	    	$response['message'] = trans("message.register_success" );
-	    	return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 200);
+	    	return $this->response_success($response);
     	}
     	else{
     		$response['message'] = trans('message.invalid_request') ;
@@ -206,8 +219,9 @@ class LoginController extends Controller
     			'new_password' => 'required|min:5|different:password',
     			]);
     	if ($validator->fails()) {
+    		Log::info("post_change_password :Validation Fails");
     		$valid = ['email_id','password','new_password'];
-    		$response = $this->validation_check($validator,$valid);
+    		$response = $this->validation_error_mapper($validator,$valid);
     		$response['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
     		 
@@ -222,14 +236,11 @@ class LoginController extends Controller
     	if(Hash::check($password, $valid_user->password) && $valid_user->is_active == 1){
     		//* Update User Password *// 
     		$row_affect = UserModel::where('email_id',$email_id)->update(['password' =>$newpassword]);
-    		Log::info($row_affect);
-    		$status = trans("message.rest_status_success" );
-    		$statusCode = 200;
+    		Log::info("post_change_password :Password change successfully. Row affected: ".$row_affect);
     		$response['message'] = trans("message.change_password_success" );
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response), 200);
+    		return $this->response_success($response);
     	}
     	else{
-    		
     		$response['message'] = trans('message.invalid_credentials');
     		return $this->response_fail($response);
     	}

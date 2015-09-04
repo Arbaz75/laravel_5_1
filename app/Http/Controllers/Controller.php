@@ -10,13 +10,13 @@ abstract class Controller extends BaseController {
 	use DispatchesJobs, ValidatesRequests;
 	
 	/**
-	 * validation_check
+	 * validation_error_mapper
 	 * 
 	 * @param unknown $validator
 	 * @param unknown $valid
 	 * @return unknown
 	 */
-	public static function validation_check($validator, $valid) {
+	public static function validation_error_mapper($validator, $valid) {
 		$msgs = $validator->errors ();
 		$array_count = count ( $valid );
 		for($i = 0; $i < $array_count; $i ++) {
@@ -36,10 +36,10 @@ abstract class Controller extends BaseController {
 	 */
 	public function response_fail($response) {
 		$status = trans ( "message.rest_status_fail" );
-		$statusCode = 203;
+		$apiStatusCode = 203;
 		return response ()->json ( array (
 				"status" => $status,
-				"status_code" => $statusCode,
+				"status_code" => $apiStatusCode,
 				"response" => $response 
 		), 203 );
 	}
@@ -53,10 +53,10 @@ abstract class Controller extends BaseController {
 	 */
 	public function response_success($response) {
 		$status = trans ( "message.rest_status_success" );
-		$statusCode = 200;
+		$apiStatusCode = 200;
 		return response ()->json ( array (
 				"status" => $status,
-				"status_code" => $statusCode,
+				"status_code" => $apiStatusCode,
 				"response" => $response 
 		), 200 );
 	}

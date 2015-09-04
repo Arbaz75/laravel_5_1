@@ -15,48 +15,45 @@ use Log;
 class EventController extends Controller
 {
 	
+	/**
+	 * Constructor Method
+	 * 
+	 * @param AuthRepositoryEloquent $auth
+	 */
 	public function __construct(AuthRepositoryEloquent $auth){
 		$this->auth = $auth;
 	
 	}
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function get_event_list($event_id)
+   	
+	/**
+	 * get_event
+	 * 
+	 * @param unknown $event_id
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+    public function get_event($event_id)
     {
     	$event_data = MemberEventModel::where('event_id',$event_id)->first();
     	if(!empty($event_data))
     	{
-    		$response['event_details'] = array(
-    			'name' => $event_data->name,
-    			'date_created' => $event_data->date_created,
-    			'number_of_intervals' => $event_data->intervals,
-    			'goal_time' => $event_data->goal_time,
-    			'is_completed' => $event_data->is_completed,
-    			
-    		);
+    		$response['event_details'] = $event_data; 
     		$laps_data = IntervalRecordModel::where('event_id',$event_id)->orderBy('lap_id','desc')->get();
-    		Log::info($laps_data);
+    		
     		foreach($laps_data as $lap){
     			
     			$response['laps_details'][$lap->lap_id] = $lap->lap_time;
     		}
-    				   			
-    		
     		return $this->response_success($response);
     	}
     	else{
-    		
     		$response['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
     	}
-    	
     }
     
     /**
      * post_add_event
+     * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -72,8 +69,9 @@ class EventController extends Controller
     			]);
     	
     	if ($validator->fails()) {
+    		Log::info('post_add_event:Validation Fails');
     		$valid = ['member_id','name','goal_time','distance','interval'];
-    		$response = $this->validation_check($validator,$valid);
+    		$response = $this->validation_error_mapper($validator,$valid);
     		$response['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
     		 
@@ -95,6 +93,7 @@ class EventController extends Controller
     			
     		);
     	$event_data = MemberEventModel::create($event_detail);
+    	Log::info('post_add_event:Data Inserted successfully');
     	if(!empty($event_data)){
     		$response['event_detail'] = $event_data;
     		$response['message'] = trans('message.data_insert_success');;
@@ -122,24 +121,23 @@ class EventController extends Controller
     			]);
     	
     	if ($validator->fails()) {
+    		Log::info('post_event_update:Validation Fails');
     		$valid = ['event_id','name','laps'];
-    		$response = $this->validation_check($validator,$valid);
+    		$response = $this->validation_error_mapper($validator,$valid);
     		$errors['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
-    		 
     	}
-    	
     	$laps_array = $request->input('laps');
     	$name = $request->input('name');
     	$event_id = $request->input('event_id');
-    	$update_detail = array(
-    			'name' => $name,
-    			'date_created' => date('Y-m-d H:i:s'),
-    		);
-    	//Update Event table
-    	$event_data = MemberEventModel::where ( 'event_id', $event_id )->update( $update_detail );
-		$laps_count = count($laps_array)+1;
-		
+    	
+    	/*Update Event table*/
+   		$event_data = MemberEventModel::find($event_id);
+    	$event_data->name  = $name;
+    	$event_data->date_created  = date('Y-m-d H:i:s');
+    	$event_data->save();
+    	
+    	$laps_count = count($laps_array)+1;
 		//*Update Interval Records*//
 		foreach($laps_array as  $lap){
 				$valid_time = $this->auth->time_validate($lap['lap_time']);
@@ -153,23 +151,17 @@ class EventController extends Controller
 					$response['message'] = trans('message.invalide_time');
 					return $this->response_fail($response);
 				}
-
-
-			
 		}
-		/**/
-		
-    	if($event_data==1){
+		if(!empty($event_data)){
+			$response['event_detail'] = $event_data;
     		$response['message'] = trans('message.event_updated');
     		return $this->response_success($response);
     	}
     	else{
-    		
     		$response['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
     	}
     	
     }
-    
     
 }
