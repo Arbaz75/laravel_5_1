@@ -152,25 +152,28 @@ class LoginController extends Controller
     {
     	$validator = Validator::make($request->all(), [
     			'email_id' => 'required|unique:members|email',
-    			'name' => 'required|alpha',
+    			'first_name' => 'required|alpha',
+    			'last_name' => 'required|alpha',
     			'password' => 'required|min:5',
     			'city' => 'required|alpha',
     			]);
     	if ($validator->fails()) {
-    		$valid = ['email_id','name','password','city'];
+    		$valid = ['email_id','first_name','last_name','password','city'];
     		$response = $this->validation_check($validator,$valid);
     		$response['message'] = trans('message.invalid_request') ;
         	return $this->response_fail($response);
         	
     	}
     	
-    	$name = $request->input('name');
+    	$first_name = $request->input('firt_name');
+    	$last_name = $request->input('last_name');
     	$email_id = $request->input('email_id');
     	$password = Hash::make($request->input('password'));
     	$city = $request->input('city');
     	
     	$user_data = array(
-    		'name' => $name,
+    		'first_name' => $first_name,
+    		'last_name' => $last_name,
     		'email_id' => $email_id,
     		'password' => $password,
     		'city' => $city, 

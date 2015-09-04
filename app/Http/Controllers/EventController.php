@@ -79,7 +79,6 @@ class EventController extends Controller
     		 
     	}
     	
-    	
     	$name = $request->input('name');
     	$member_id = $request->input('member_id');
     	$goal_time = $request->input('goal_time');
