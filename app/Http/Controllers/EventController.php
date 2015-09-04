@@ -56,11 +56,11 @@ class EventController extends Controller
     }
     
     /**
-     * post_event
+     * post_add_event
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-	public function post_event(Request $request)
+	public function post_add_event(Request $request)
     {
     	$validator = Validator::make($request->all(), [
     			'member_id'=> 'required|numeric',
@@ -73,7 +73,7 @@ class EventController extends Controller
     	
     	if ($validator->fails()) {
     		$valid = ['member_id','name','goal_time','distance','interval'];
-    		$response = validation_check($validator,$valid);
+    		$response = $this->validation_check($validator,$valid);
     		$response['message'] = trans('message.invalid_request');
     		return $this->response_fail($response);
     		 
@@ -145,17 +145,17 @@ class EventController extends Controller
 		foreach($laps_array as  $lap){
 				$valid_time = $this->auth->time_validate($lap['lap_time']);
 				if($valid_time == 1){
-					IntervalRecordModel::updateOrCreate(array('event_id' => $event_id,'lap_id'=>$lap['lap_id']),[
-					'lap_id'=>$lap['lap_id'],
-					'lap_time' =>$lap['lap_time'],
+					IntervalRecordModel::updateOrCreate(array('event_id' => $event_id, 'lap_id' => $lap['lap_id']), [
+						'lap_id' => $lap['lap_id'],
+						'lap_time' => $lap['lap_time'],
 					]);
 				}
 				else{
 					$response['message'] = trans('message.invalide_time');
 					return $this->response_fail($response);
 				}
-				
-			
+
+
 			
 		}
 		/**/
