@@ -10,6 +10,8 @@ class UserModel extends Model
     
     protected $primary = ['member_id'];
 
+    protected $hidden = ['password'];
+
     protected $fillable = ['name', 'email_id', 'password','city','date_created','last_activity'];
 
     public $timestamps = false;

@@ -51,7 +51,7 @@ class AuthRepositoryEloquent
     
     public function time_validate($time)
     {
-    	return preg_match("/(2[0-3]|[01][0-9]):([0-5][0-9])/", $time);
+    	return preg_match("/^(2[0-3]|[01][0-9]):([0-5][0-9])$/", $time);
     }
     
 }

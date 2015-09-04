@@ -38,21 +38,16 @@ class LoginController extends Controller
         $email = $request->input('email_id');
         $password =$request->input('password');
 		//*** Fetch User Details ***//
-        $user = DB::table('members')->where('email_id', $email)->first();
+        $user = UserModel::where('email_id', $email)->first();
         if($user != Null){
 
             if(Hash::check($password, $user->password) && $user->is_active == 1){
-				$token = $this->auth->generate_token_for_user($user->member_id);
-                $response = array(
-                    'first_name' => $user->first_name,
-                	'last_name' => $user->last_name,
-                    'email'    => $user->email_id,
-                    'token'    => $token,
-                );
+				$user->token = $this->auth->generate_token_for_user($user->member_id);
+				$response = $user;
                 $status = trans("message.rest_status_success" );
                 $statusCode = 200;
                 $message = trans("message.login_success" );
-                return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 200);
+                return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response ), 200);
                 
             }
             else{

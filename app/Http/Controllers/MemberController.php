@@ -106,8 +106,10 @@ class MemberController extends Controller
     	$event_data = MemberEventModel::where('member_id',$member_id)->skip($start)->take($length)->get();
     	if(!empty($event_data)){
     			
-    		$response['event_details'] = $event_data;
+    		$response['events'] = $event_data;
     		$response['total_events'] = $event_count;
+			$response['start'] = $start;
+			$response['length'] = $length;
     		return $this->response_success($response);
     	}
     	else{

@@ -31,7 +31,7 @@ Route::group(['prefix' => 'api/v1','middleware' => 'check'],function()
       	Route::get('user/{member_id}/events/{start?}/{length?}', 'MemberController@get_events');
       	//**Event Route**//
       	Route::get('event/{event_id}', 'EventController@get_event_list');
-      	Route::post('event/add', 'EventController@post_event');
+      	Route::post('event/add', 'EventController@post_add_event');
       	Route::post('event/update', 'EventController@post_event_update');
       
       });
