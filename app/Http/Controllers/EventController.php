@@ -22,7 +22,7 @@ class EventController extends Controller
 	 */
 	public function __construct(AuthRepositoryEloquent $auth){
 		$this->auth = $auth;
-	
+		Log::info("EventController initialized");
 	}
    	
 	/**
@@ -36,13 +36,8 @@ class EventController extends Controller
     	$event_data = MemberEventModel::where('event_id',$event_id)->first();
     	if(!empty($event_data))
     	{
-    		$response['event_details'] = $event_data; 
-    		$laps_data = IntervalRecordModel::where('event_id',$event_id)->orderBy('lap_id','desc')->get();
-    		
-    		foreach($laps_data as $lap){
-    			
-    			$response['laps_details'][$lap->lap_id] = $lap->lap_time;
-    		}
+			$event_data->laps = IntervalRecordModel::where('event_id',$event_id)->orderBy('lap_id','desc')->get();
+			$response['event_details'] = $event_data;
     		return $this->response_success($response);
     	}
     	else{

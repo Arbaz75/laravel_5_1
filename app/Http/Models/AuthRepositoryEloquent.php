@@ -33,7 +33,7 @@ class AuthRepositoryEloquent
     	$PasswordVerificationToken = str_random(30);
     	MemberTokenModel::updateOrCreate(array('member_id' => $member_id),array(
     	'token'=> $PasswordVerificationToken,
-    	'member_id' => $userId)
+    	'member_id' => $member_id)
     	);
     	return $PasswordVerificationToken;
     	
@@ -48,7 +48,14 @@ class AuthRepositoryEloquent
 		
 		});
     }
-    
+
+    /**
+     * time_validate
+     * Validates HH:mm format
+     *
+     * @param $time
+     * @return int
+     */
     public function time_validate($time)
     {
     	return preg_match("/^(2[0-3]|[01][0-9]):([0-5][0-9])$/", $time);

@@ -13,6 +13,13 @@ use Log;
 
 class MemberController extends Controller
 {
+	/**
+	 * Constructor Method
+	 *
+	 */
+    public function __construct(){
+        Log::info("MemberController initialized");
+    }
 	
     /**
      * get_user_detail

@@ -23,7 +23,7 @@ class LoginController extends Controller
 	 */
     public function __construct(AuthRepositoryEloquent $auth){
         $this->auth = $auth;
-        
+        Log::info("LoginController initialized");
     }
     
     /**
