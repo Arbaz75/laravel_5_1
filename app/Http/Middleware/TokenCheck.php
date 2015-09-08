@@ -19,10 +19,7 @@ class TokenCheck
         $key =  config('custom.api_key',Null);
         
         if($api_key !== $key){
-            $statusCode = 500;
-            $status = trans('message.rest_status_fail');
-            $error['message'] = trans('message.invalid_api_key');
-            return response()->json(array("status"=>$status, 'satus_code'=>$statusCode, 'response'=>$error),500);
+            return app('\App\Http\Controllers\LoginController')->exception_handler(array("response" => array( 'message' => trans('message.invalid_api_key')) ));
         }
         return $next($request);
     }

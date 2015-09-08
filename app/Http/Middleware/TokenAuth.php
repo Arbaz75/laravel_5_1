@@ -28,18 +28,11 @@ class TokenAuth
     			return $next($request);
     		}
     		else{
-    			$statusCode = 500;
-    			$status = trans("message.rest_status_fail");
-    			$response['message'] = trans('message.unauthorized_user') ;
-    			return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 500);
+				return app('\App\Http\Controllers\LoginController')->exception_handler(array("response" => array( 'message' => trans('message.unauthorized_user')) ));
     		}
     	}
     	else{
-    		$statusCode = 500;
-    		$status = trans("message.rest_status_fail");
-    		$response['message'] = trans('message.empty_token') ;
-    		return response()->json(array("status" => $status, "status_code" => $statusCode, "response" => $response, ), 500);
-    		
+			return app('\App\Http\Controllers\LoginController')->exception_handler(array("response" => array( 'message' => trans('message.empty_token')) ));
     	}
         
     }
