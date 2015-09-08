@@ -22,7 +22,7 @@ class TokenCheck
             $statusCode = 500;
             $status = trans('message.rest_status_fail');
             $error['message'] = trans('message.invalid_api_key');
-            return response()->json(array("status"=>$status, 'satus code'=>$statusCode, 'response'=>$error),500);
+            return response()->json(array("status"=>$status, 'satus_code'=>$statusCode, 'response'=>$error),500);
         }
         return $next($request);
     }
