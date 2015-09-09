@@ -161,7 +161,8 @@ class LoginController extends Controller
     			'email_id' => 'required|unique:members|email',
     			'first_name' => 'required|alpha',
     			'last_name' => 'required|alpha',
-    			'password' => 'required|min:5',
+    			'password' => 'required|min:5|confirmed',
+    			'password_confirmation' => 'required|min:5',
     			'city' => 'required|alpha',
     			]);
     	if ($validator->fails()) {
